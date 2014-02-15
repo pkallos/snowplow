@@ -49,8 +49,7 @@ module SnowPlow
         @jobflow.keep_job_flow_alive_when_no_steps = true
         if true # config[:hbase]
           # Add bootstrap action to install and configure HBase on the cluster
-          # TODO: update following fix of https://github.com/rslifka/elasticity/issues/55
-          install_hbase_action = Elasticity::BootstrapAction.new("s3://#{config[:s3][:region]}.elasticmapreduce/bootstrap-actions/setup-hbase", 'placeholder', 'placeholder')
+          install_hbase_action = Elasticity::BootstrapAction.new("s3://#{config[:s3][:region]}.elasticmapreduce/bootstrap-actions/setup-hbase")
           @jobflow.add_bootstrap_action(install_hbase_action)
           
           # Step to start the Hbase master
@@ -68,6 +67,13 @@ module SnowPlow
               @jobflow.send("#{k}=", value)
             end
           }
+        end
+
+        # Experimenting with installing Lingual
+        if true # config[:lingual]
+          # Add bootstrap action to install and configure the Lingual client on the cluster
+          install_lingual_action = Elasticity::BootstrapAction.new("s3://files.concurrentinc.com/lingual/1.0/lingual-client/install-lingual-client.sh")
+          @jobflow.add_bootstrap_action(install_lingual_action)
         end
 
         # Now let's add our task group if required
