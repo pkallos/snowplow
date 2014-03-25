@@ -57,7 +57,13 @@ import thrift.SnowplowRawEvent
  * Kinesis Sink for the Scala collector.
  */
 class KinesisSink(config: CollectorConfig) extends AbstractSink {
-  private lazy val log = LoggerFactory.getLogger(getClass())
+  private lazy val log = {
+    import ch.qos.logback.classic._
+    val log = LoggerFactory.getLogger(classOf[KinesisSink]).asInstanceOf[Logger]
+    log.setLevel(Level.valueOf(config.loglevel))
+    log
+  }
+
   import log.{error, debug, info, trace}
 
   // Create a Kinesis client for stream interactions.

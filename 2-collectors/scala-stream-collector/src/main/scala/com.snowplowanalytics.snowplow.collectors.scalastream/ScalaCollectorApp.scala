@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2013-2014 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0, and
@@ -135,5 +135,10 @@ class CollectorConfig(config: Config) {
   private val stream = kinesis.getConfig("stream")
   val streamName = stream.getString("name")
   val streamSize = stream.getInt("size")
+
+  val loglevel = kinesis.hasPath("loglevel") match {
+    case true => kinesis.getString("loglevel")
+    case _ => "DEBUG"
+  }
 }
 
