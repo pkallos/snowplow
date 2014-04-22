@@ -114,7 +114,7 @@ class EtlJob(args: Args) extends Job(args) {
 
   // Aliases for our job
   val inputPipe = getInputPipe(etlConfig.inFormat, etlConfig.inFolder)
-  val goodOutput = Tsv(etlConfig.outFolder)
+  val goodOutput = getOutputPipe(etlConfig.compressionFormat, etlConfig.outFolder)
 
   // TODO: find a better way to do this
   val badOutput = jobConfOption match {
@@ -207,6 +207,18 @@ class EtlJob(args: Args) extends Job(args) {
     format match {
       case "thrift-raw" => LzoThriftSource(path).toPipe('line)
       case _ => MultipleTextLineFiles(path).read
+    }
+  }
+
+  private def getOutputPipe(compressionOption: Option[String], path: String): Source = {
+    compressionOption match {
+      case Some(s: String) => {
+        s match {
+          case "lzo" => LzoTsvSource(path)
+          case _ => Tsv(path)
+        }
+      }
+      case None => Tsv(path)
     }
   }
 }

@@ -135,10 +135,10 @@ object JobSpecHelpers {
    * @param lines The Lines object
    * @return the ScaldingLines ready for Scalding
    */
-  implicit def Lines2ScaldingLines(lines : Lines): ScaldingLines = lines.numberedLines 
+  implicit def Lines2ScaldingLines(lines : Lines): ScaldingLines = lines.numberedLines
 
   // Standard JobSpec definition used by all integration tests
-  val EtlJobSpec: (String, String) => JobTest = (collector, anonQuartets) => 
+  def EtlJobSpec(collector: String, anonQuartets: String, compressionFormat: String = "none"): JobTest = {
     JobTest("com.snowplowanalytics.snowplow.enrich.hadoop.EtlJob").
       arg("input_folder", "inputFolder").
       arg("input_format", collector).
@@ -146,5 +146,7 @@ object JobSpecHelpers {
       arg("output_folder", "outputFolder").
       arg("bad_rows_folder", "badFolder").
       arg("anon_ip_quartets", anonQuartets).
-      arg("exceptions_folder", "exceptionsFolder")
+      arg("exceptions_folder", "exceptionsFolder").
+      arg("compression_format", compressionFormat)
+  }
 }

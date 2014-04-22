@@ -6,3 +6,4 @@ import com.snowplowanalytics.snowplow.collectors.thrift.SnowplowRawEvent
 
 case class LzoThriftSource(p: String) extends FixedPathLzoThrift[SnowplowRawEvent](p: String)
 
+case class LzoTsvSource(p: String) extends FixedPathSource(p: String) with LzoTsv

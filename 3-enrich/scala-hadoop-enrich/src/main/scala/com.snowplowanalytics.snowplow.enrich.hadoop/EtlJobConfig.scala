@@ -42,7 +42,9 @@ case class EtlJobConfig(
     outFolder: String,
     badFolder: String,
     anonOctets: AnonOctets,
-    exceptionsFolder: Option[String])
+    exceptionsFolder: Option[String],
+    compressionFormat: Option[String]
+)
 
 /**
  * Module to handle configuration for
@@ -111,7 +113,8 @@ object EtlJobConfig {
     val badFolder = args.requiredz("bad_rows_folder")
     val anonOctets = args.requiredz("anon_ip_quartets").flatMap(q => getAnonOctets(q))
     val exceptionsFolder = args.optionalz("exceptions_folder")
+    val compressionFormat = args.optionalz("compression_format")
 
-    (inFolder.toValidationNel |@| inFormat.toValidationNel |@| maxmindFile.toValidationNel |@| outFolder.toValidationNel |@| badFolder.toValidationNel |@| anonOctets.toValidationNel |@| exceptionsFolder.toValidationNel) { EtlJobConfig(_,_,_,_,_,_,_) }
+    (inFolder.toValidationNel |@| inFormat.toValidationNel |@| maxmindFile.toValidationNel |@| outFolder.toValidationNel |@| badFolder.toValidationNel |@| anonOctets.toValidationNel |@| exceptionsFolder.toValidationNel |@| compressionFormat.toValidationNel) { EtlJobConfig(_,_,_,_,_,_,_,_) }
   }
 }

@@ -177,9 +177,9 @@ object LzoThriftSpec {
 class LzoThriftSpec extends Specification {
 
   "A job which processes a RawThrift file containing 1 valid page view" should {
-    EtlJobSpec("thrift-raw", "0").
+    EtlJobSpec("thrift-raw", "0", "lzo").
       source(LzoThriftSource("inputFolder"), LzoThriftSpec.lines).
-      sink[TupleEntry](Tsv("outputFolder")){ buf : Buffer[TupleEntry] =>
+      sink[TupleEntry](LzoTsvSource("outputFolder")){ buf : Buffer[TupleEntry] =>
         "correctly output 1 page view" in {
           buf.size must_== 1
           val actual = buf.head
