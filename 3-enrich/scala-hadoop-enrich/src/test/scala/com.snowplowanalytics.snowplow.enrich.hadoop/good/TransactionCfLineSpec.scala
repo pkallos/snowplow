@@ -153,7 +153,7 @@ object TransactionCfLineSpec {
  * Check that all tuples in a transaction event
  * (CloudFront format) are successfully extracted.
  */
-class TransactionCfLineTest extends Specification {
+class TransactionCfLineSpec extends Specification {
 
   "A job which processes a CloudFront file containing 1 valid transaction" should {
     EtlJobSpec("cloudfront", "4").

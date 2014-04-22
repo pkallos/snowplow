@@ -153,7 +153,7 @@ object StructEventCfLineSpec {
  * Check that all tuples in a custom structured event
  * (CloudFront format) are successfully extracted.
  */
-class StructEventCfLineTest extends Specification {
+class StructEventCfLineSpec extends Specification {
 
   "A job which processes a CloudFront file containing 1 valid custom structured event" should {
     EtlJobSpec("cloudfront", "0").

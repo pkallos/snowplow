@@ -154,7 +154,7 @@ object PagePingCfLineSpec {
  * (CloudFront format) are successfully
  * extracted.
  */
-class PagePingCfLineTest extends Specification {
+class PagePingCfLineSpec extends Specification {
 
   "A job which processes a CloudFront file containing 1 valid page ping" should {
     EtlJobSpec("cloudfront", "0").

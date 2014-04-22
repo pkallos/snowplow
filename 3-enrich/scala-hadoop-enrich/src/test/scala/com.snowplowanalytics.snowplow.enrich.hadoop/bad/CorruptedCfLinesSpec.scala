@@ -49,7 +49,7 @@ object CorruptedCfLinesSpec {
  * access log format, but the fields
  * are somehow corrupted.
  */
-class CorruptedCfLinesTest extends Specification {
+class CorruptedCfLinesSpec extends Specification {
 
   "A job which processes a corrupted input line" should {
     EtlJobSpec("cloudfront", "0").

@@ -159,7 +159,7 @@ object Sep2013CfLineSpec {
  * For details:
  * https://forums.aws.amazon.com/thread.jspa?threadID=134017&tstart=0#
  */
-class Sep2013CfLineTest extends Specification {
+class Sep2013CfLineSpec extends Specification {
 
   "A job which processes a CloudFront file containing 1 valid page view" should {
     EtlJobSpec("cloudfront", "0").

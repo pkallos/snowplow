@@ -157,7 +157,7 @@ object CljTomcatLineSpec {
  * For details:
  * https://forums.aws.amazon.com/thread.jspa?threadID=134017&tstart=0#
  */
-class CljTomcatLineTest extends Specification {
+class CljTomcatLineSpec extends Specification {
 
   "A job which processes a Clojure-Tomcat file containing 1 valid page view" should {
     EtlJobSpec("clj-tomcat", "2").
