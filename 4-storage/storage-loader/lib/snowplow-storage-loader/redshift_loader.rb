@@ -36,9 +36,15 @@ module SnowPlow
                      ""
                    end
 
+        compression = if target[:compression] == "lzo"
+                     "LZOP"
+                   else
+                     ""
+                   end
+
         # Build the Array of queries we will run
         queries = [
-          "COPY #{target[:table]} FROM '#{config[:s3][:buckets][:in]}' CREDENTIALS '#{credentials}' DELIMITER '#{EVENT_FIELD_SEPARATOR}' MAXERROR #{target[:maxerror]} EMPTYASNULL FILLRECORD TRUNCATECOLUMNS #{comprows} TIMEFORMAT 'auto';",
+          "COPY #{target[:table]} FROM '#{config[:s3][:buckets][:in]}' CREDENTIALS '#{credentials}' DELIMITER '#{EVENT_FIELD_SEPARATOR}' MAXERROR #{target[:maxerror]} EMPTYASNULL FILLRECORD TRUNCATECOLUMNS #{comprows} #{compression} TIMEFORMAT 'auto';",
         ]
         unless config[:skip].include?('analyze')
           queries << "ANALYZE #{target[:table]};"
