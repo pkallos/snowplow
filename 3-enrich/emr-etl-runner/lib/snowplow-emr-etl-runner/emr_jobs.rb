@@ -129,7 +129,8 @@ module SnowPlow
           "--maxmind_file"      , config[:maxmind_asset],
           "--output_folder"     , partition.call(config[:s3][:buckets][:out]),
           "--bad_rows_folder"   , partition.call(config[:s3][:buckets][:out_bad_rows]),
-          "--anon_ip_quartets"  , config[:enrichments][:anon_ip_octets]
+          "--anon_ip_quartets"  , config[:enrichments][:anon_ip_octets],
+          "--compression_format", config[:etl][:compression_format]
         ]
 
         # Conditionally add exceptions_folder
