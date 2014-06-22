@@ -54,6 +54,9 @@ import collectors.thrift.{
   PayloadFormat
 }
 
+// Logging
+import org.slf4j.LoggerFactory
+
 /**
  * Source to read events from a Kinesis stream
  *
@@ -61,28 +64,31 @@ import collectors.thrift.{
  */
 class KinesisSource(config: KinesisEnrichConfig)
     extends AbstractSource(config) {
-  
+
+  private lazy val log = LoggerFactory.getLogger(getClass())
+  import log.{error, debug, info, trace}
+
   /**
    * Never-ending processing loop over source stream.
    */
   def run {
     val workerId = InetAddress.getLocalHost().getCanonicalHostName() +
       ":" + UUID.randomUUID()
-    println("Using workerId: " + workerId)
+    info("Using workerId: " + workerId)
 
     val kinesisClientLibConfiguration = new KinesisClientLibConfiguration(
       config.appName,
-      config.rawInStream, 
+      config.rawInStream,
       kinesisProvider,
       workerId
     ).withInitialPositionInStream(
       InitialPositionInStream.valueOf(config.initialPosition)
     )
-    
-    println(s"Running: ${config.appName}.")
-    println(s"Processing raw input stream: ${config.rawInStream}")
 
-    
+    info(s"Running: ${config.appName}.")
+    info(s"Processing raw input stream: ${config.rawInStream}")
+
+
     val rawEventProcessorFactory = new RawEventProcessorFactory(
       config,
       sink.get // TODO: yech
@@ -118,17 +124,17 @@ class KinesisSource(config: KinesisEnrichConfig)
     private val BACKOFF_TIME_IN_MILLIS = 3000L
     private val NUM_RETRIES = 10
     private val CHECKPOINT_INTERVAL_MILLIS = 1000L
-      
+
     @Override
     def initialize(shardId: String) = {
-      println("Initializing record processor for shard: " + shardId)
+      info("Initializing record processor for shard: " + shardId)
       this.kinesisShardId = shardId
     }
 
     @Override
     def processRecords(records: List[Record],
         checkpointer: IRecordProcessorCheckpointer) = {
-      println(s"Processing ${records.size} records from $kinesisShardId")
+      info(s"Processing ${records.size} records from $kinesisShardId")
       processRecordsWithRetries(records)
 
       if (System.currentTimeMillis() > nextCheckpointTimeInMillis) {
@@ -142,12 +148,12 @@ class KinesisSource(config: KinesisEnrichConfig)
     private def processRecordsWithRetries(records: List[Record]) = {
       for (record <- records) {
         try {
-          println(s"Sequence number: ${record.getSequenceNumber}")
-          println(s"Partition key: ${record.getPartitionKey}")
+          info(s"Sequence number: ${record.getSequenceNumber}")
+          info(s"Partition key: ${record.getPartitionKey}")
           enrichEvent(record.getData.array)
         } catch {
           case t: Throwable =>
-            println(s"Caught throwable while processing record $record")
+            error(s"Caught throwable while processing record $record")
             println(t)
         }
       }
@@ -156,14 +162,14 @@ class KinesisSource(config: KinesisEnrichConfig)
     @Override
     def shutdown(checkpointer: IRecordProcessorCheckpointer,
         reason: ShutdownReason) = {
-      println(s"Shutting down record processor for shard: $kinesisShardId")
+      info(s"Shutting down record processor for shard: $kinesisShardId")
       if (reason == ShutdownReason.TERMINATE) {
         checkpoint(checkpointer)
       }
     }
-      
+
     private def checkpoint(checkpointer: IRecordProcessorCheckpointer) = {
-      println(s"Checkpointing shard $kinesisShardId")
+      info(s"Checkpointing shard $kinesisShardId")
       breakable {
         for (i <- 0 to NUM_RETRIES-1) {
           try {
@@ -171,16 +177,16 @@ class KinesisSource(config: KinesisEnrichConfig)
             break
           } catch {
             case se: ShutdownException =>
-              println("Caught shutdown exception, skipping checkpoint.", se)
+              error("Caught shutdown exception, skipping checkpoint.", se)
             case e: ThrottlingException =>
               if (i >= (NUM_RETRIES - 1)) {
-                println(s"Checkpoint failed after ${i+1} attempts.", e)
+                error(s"Checkpoint failed after ${i+1} attempts.", e)
               } else {
-                println(s"Transient issue when checkpointing - attempt ${i+1} of "
+                error(s"Transient issue when checkpointing - attempt ${i+1} of "
                   + NUM_RETRIES, e)
               }
             case e: InvalidStateException =>
-              println("Cannot save checkpoint to the DynamoDB table used by " +
+              error("Cannot save checkpoint to the DynamoDB table used by " +
                 "the Amazon Kinesis Client Library.", e)
           }
           Thread.sleep(BACKOFF_TIME_IN_MILLIS)
