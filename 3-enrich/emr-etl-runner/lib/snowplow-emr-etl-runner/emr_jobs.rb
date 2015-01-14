@@ -52,6 +52,10 @@ module SnowPlow
         if config[:etl][:collector_format] == 'thrift-raw'
             [
               Elasticity::HadoopBootstrapAction.new('-s', 'io.file.buffer.size=65536'),
+              Elasticity::HadoopBootstrapAction.new('-s', "fs.s3n.awsAccessKeyId=#{config[:aws][:access_key_id]}"),
+              Elasticity::HadoopBootstrapAction.new('-s', "fs.s3n.awsAccessKeyId=#{config[:aws][:access_key_id]}"),
+              Elasticity::HadoopBootstrapAction.new('-s', "fs.s3.awsSecretAccessKey=#{config[:aws][:secret_access_key]}"),
+              Elasticity::HadoopBootstrapAction.new('-s', "fs.s3.awsSecretAccessKey=#{config[:aws][:secret_access_key]}"),
               Elasticity::HadoopBootstrapAction.new('-m', 'mapreduce.user.classpath.first=true')
             ].each do |action|
               @jobflow.add_bootstrap_action(action)
